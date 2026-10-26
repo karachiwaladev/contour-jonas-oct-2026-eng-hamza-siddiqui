@@ -38,7 +38,7 @@ Update this table whenever a project is added, renamed or retired.
 
 | Project | Folder | Purpose | Status |
 |---------|--------|---------|--------|
-| Todo app | `todo/` | Tasks with due dates and tags; status and tag filters; stored in IndexedDB (#4, #5) | Done |
+| Todo app | `todo/` | Tasks with due dates, tags and daily/weekly/monthly repeats; status and tag filters; stored in IndexedDB (#4, #5, #7) | Done |
 
 ### Adding a project
 
