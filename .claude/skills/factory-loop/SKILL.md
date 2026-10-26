@@ -1,6 +1,6 @@
 ---
 name: factory-loop
-description: Work through the open GitHub issues in the current repo like a ticket factory. For each one, react with 👀, then do what the ticket asks. It answers questions and also takes the action: creating or editing files, building or extending projects, opening follow-up issues, and anything else that can be done safely inside this repo. For a project or feature, it first asks the user clarifying questions, gets a plan approved, builds, verifies in Chrome through the chrome-devtools MCP, and attaches screenshots to the ticket. It commits with the ticket referenced, pushes to main, comments, and closes. It never takes destructive actions; tickets that would need one are flagged for a human. Use this whenever the user asks to process, triage, answer, work through or clear the repo's issues or tickets, says something like "handle the tickets" or "check for new issues and do them", or wants to poll for new issues on a schedule (for example `/loop 1m /factory-loop`).
+description: Work through the open GitHub issues in the current repo like a ticket factory. For each one, react with 👀, then do what the ticket asks. It answers questions and also takes the action: creating or editing files, building or extending projects, opening follow-up issues, and anything else that can be done safely inside this repo. For a project or feature, it first asks clarifying questions and gets a plan approved in comments on the GitHub issue, then builds, verifies in Chrome through the chrome-devtools MCP, and attaches screenshots to the ticket. It commits with the ticket referenced, pushes to main, comments, and closes. It never takes destructive actions; tickets that would need one are flagged for a human. Use this whenever the user asks to process, triage, answer, work through or clear the repo's issues or tickets, says something like "handle the tickets" or "check for new issues and do them", or wants to poll for new issues on a schedule (for example `/loop 1m /factory-loop`).
 ---
 
 # Factory loop
@@ -9,7 +9,7 @@ Process the open issues in the current repo's GitHub project, one at a time:
 
 **fetch → react 👀 → do the work (answer + act) → push → comment → close**
 
-To build a project or a feature, do the work in this order: **clarify with the user → plan → get approval → build → verify in Chrome → push with screenshots**. Step 5b has the details.
+To build a project or a feature, do the work in this order: **clarify on the issue → plan on the issue → get approval on the issue → build → verify in Chrome → push with screenshots**. All questions and approvals happen in GitHub issue comments, never in the session. Step 5b has the details.
 
 The ticket author wants the outcome, not a description of it. If a ticket says "build X", "add Y" or "create a ticket for Z", produce X, Y or Z. If it asks a question, answer it, and also do any action the question implies. The 👀 reaction says the ticket is picked up, the pushed commit or the created item is the work, and closing the issue marks it done. Only what is on GitHub counts.
 
@@ -38,7 +38,13 @@ Without this check, a looping run would work the same ticket again and again. Fo
 gh api repos/{owner}/{repo}/issues/{n}/reactions --jq '[.[] | select(.content=="eyes") | .user.login]'
 ```
 
-If the current user has already reacted 👀 and the issue is still open, it was flagged for a human on an earlier run, so skip it. There's one exception: if a human has commented since the flag, re-read the ticket and handle it again. For example, the human may have clarified the ticket or said "go ahead".
+If the current user has already reacted 👀 and the issue is still open, an earlier run is waiting on a human: it asked questions, posted a plan for approval, or flagged the ticket. Fetch the comments:
+
+```bash
+gh api repos/{owner}/{repo}/issues/{n}/comments --jq '.[] | {user: .user.login, created_at, body}'
+```
+
+The factory may post as the same account as the human, so tell its comments apart by the `<!-- factory-loop -->` marker on their first line (see Step 5a). If no comment without the marker came after the last marked one, skip the issue. Otherwise a human has replied: re-read the ticket and the whole thread, then carry on from where it stopped. An answer to questions leads to the plan; an approval ("approve", "go ahead", "lgtm") leads to the build; requested changes lead to a revised plan.
 
 ## Step 3: React 👀
 
@@ -84,10 +90,11 @@ Do the same if a ticket is too unclear to act on.
 - If a number comes from memory rather than a live source, name where it comes from (for example "2023 census"). Don't present it as exact if it isn't.
 - If the question implies an action, for example "create a ticket asking about X" or "write this down in the docs", do that too (Step 5b or 5c).
 
-Post comments from a heredoc in the Bash tool. This keeps markdown, quotes and newlines intact:
+Post comments from a heredoc in the Bash tool. This keeps markdown, quotes and newlines intact. Start every comment the factory posts with the hidden `<!-- factory-loop -->` marker, so Step 2 can tell it apart from a human's reply:
 
 ```bash
 gh issue comment {n} --repo {owner}/{repo} --body-file - <<'EOF'
+<!-- factory-loop -->
 **Answer:** The largest city in Pakistan by population is **Karachi**.
 
 - **Population:** roughly 20.4 million (Karachi Division, 2023 Pakistan Census).
@@ -99,17 +106,19 @@ EOF
 
 Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) go straight to step 5 below. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → build → verify in the browser → ship.** Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
 
+Questions and approval happen **on the GitHub issue**, not in the session: don't use `AskUserQuestion`. Each step that needs a human posts a comment, leaves the issue open, and ends work on that ticket for this run. Step 2 picks the ticket back up once a human replies.
+
 1. **Clarify.** Read the root `CLAUDE.md`, plus the project's own `CLAUDE.md` and code if it exists.
    - List the assumptions the ticket leaves open: data model, UI placement, edge cases, scope, and anything ambiguous.
-   - Ask the user **here in the session** with `AskUserQuestion`. Ask up to 4 focused questions, each offering concrete options with your recommended one first.
+   - Post up to 4 focused, numbered questions as an issue comment. Give each one lettered options with your recommendation first and marked **(recommended)**, and say that replying "go with the recommendations" is fine.
    - Don't ask about things the ticket or the code already settles.
-   - If nothing is genuinely open, say so in one line and move on.
-2. **Plan.** Write a short plan that covers:
+   - If nothing is genuinely open, skip the questions and go straight to the plan.
+2. **Plan.** Once the questions are answered, write a short plan that covers:
    - the files to add or change;
    - the data shape, and how older stored data stays compatible;
    - the UI changes;
    - how each ticket requirement will be checked in the browser.
-3. **Get approval.** Show the plan in the session and ask the user to approve it or change it (`AskUserQuestion`: Approve / Change). Don't write code until it's approved. If the user asks for changes, revise the plan and ask again.
+3. **Get approval.** Post the plan as an issue comment that ends by asking for a reply of **approve**, or for the changes wanted. Don't write code until a human approves it on the issue. If they ask for changes, post a revised plan and wait again.
 4. **Build.** Follow the layout rules in `CLAUDE.md`:
    - A new project goes in the folder the ticket names, or `projects/<name>/` by default. It gets its own short `CLAUDE.md` and a row in the root index.
    - For an existing project, extend the code rather than rewrite it, and keep stored data compatible.
@@ -181,7 +190,8 @@ A `Closes #n` commit on `main` may already have closed it, so check `gh issue vi
 End with a short summary for the user, with one line per issue:
 
 - `#1 Largest city in Pakistan`: answered (Karachi), closed. Include a link to the comment.
-- `#4 Todo app`: built `todo/` (IndexedDB) after Q&A and an approved plan, verified in Chrome (3 screenshots), pushed `c1df3ad`, closed.
+- `#4 Todo app`: built `todo/` (IndexedDB) after Q&A and an approved plan on the issue, verified in Chrome (3 screenshots), pushed `c1df3ad`, closed.
+- `#9 Dark mode`: posted 3 clarifying questions on the issue. Waiting for a reply, left open.
 - `#6 Ask about the smallest city`: created #7 with the question and answered it there, closed.
 - `#8 Delete the old app`: needs a human (destructive). Left open.
 
@@ -193,7 +203,7 @@ If nothing was open, say that in one line.
 /loop 1m /factory-loop
 ```
 
-Each tick runs this skill once. Because of the check in Step 2, issues that are already handled or flagged are never touched twice. When a tick finds nothing new, keep the report to a single line.
+Each tick runs this skill once. Because of the check in Step 2, issues that are already handled, flagged or waiting on a reply are only touched again after a human comments. When a tick finds nothing new, keep the report to a single line.
 
 ## Auto commit and push
 
