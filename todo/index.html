@@ -11,8 +11,22 @@
     <h1>Todo</h1>
     <form id="new-task">
       <input id="title" type="text" placeholder="What needs doing?" autocomplete="off" required>
-      <button type="submit">Add</button>
+      <div class="row">
+        <label>Due <input id="due" type="date"></label>
+        <input id="tags" type="text" placeholder="Tags, comma separated" autocomplete="off">
+        <button type="submit">Add</button>
+      </div>
     </form>
+    <div id="filters">
+      <div class="status" role="group" aria-label="Filter by status">
+        <button type="button" data-status="all" aria-pressed="true">All</button>
+        <button type="button" data-status="active" aria-pressed="false">Incomplete</button>
+        <button type="button" data-status="done" aria-pressed="false">Completed</button>
+      </div>
+      <label>Tag
+        <select id="tag-filter"><option value="">All tags</option></select>
+      </label>
+    </div>
     <ul id="tasks"></ul>
     <p id="empty">No tasks yet.</p>
   </main>
