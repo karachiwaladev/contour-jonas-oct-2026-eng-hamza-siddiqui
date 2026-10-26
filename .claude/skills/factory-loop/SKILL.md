@@ -235,6 +235,8 @@ Each tick runs this skill once. Because of the check in Step 2, issues that are 
 
 ## Auto commit and push
 
+The registered Stop hook, `.claude/hooks/log-prompts.js`, appends the session's prompts to `.claude/logs/prompts.jsonl`. It then commits that file alone and pushes it to `main`, but only when `main` is checked out, so a ticket branch never picks it up. Leave that file out of ticket commits.
+
 `.claude/hooks/auto-commit.js` runs at the end of every turn once it is registered as the Stop hook in `.claude/settings.json`, replacing the `log-prompts.js` entry, since it runs that logger itself. Only a human can register it, because the factory never edits its own settings. Until it is registered, commit and push each ticket yourself.
 - **What it does:** logs the session's prompts, then commits all non-ignored changes and pushes them to the current branch. That is why each run switches back to `main` once its PR is open.
 - **What it never does:** force-push or rewrite history.

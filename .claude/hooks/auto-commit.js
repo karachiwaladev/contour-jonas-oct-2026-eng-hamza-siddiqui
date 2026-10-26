@@ -13,6 +13,7 @@ const PROMPT_LOG = ".claude/logs/prompts.jsonl";
 spawnSync(process.execPath, [path.join(projectDir, ".claude", "hooks", "log-prompts.js")], {
   input: stdin,
   cwd: projectDir,
+  env: { ...process.env, LOG_PROMPTS_NO_PUSH: "1" },
 });
 
 function git(...args) {

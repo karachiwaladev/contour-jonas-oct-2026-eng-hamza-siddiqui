@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Stop hook: append the user prompts added to the transcript since the last
-// stop to .claude/logs/prompts.jsonl, one JSON object per prompt.
+// stop to .claude/logs/prompts.jsonl, one JSON object per prompt, then commit
+// that file alone and push it to main.
+const { spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
@@ -65,3 +67,22 @@ for (let i = start; i < end; i++) {
 if (out.length) fs.appendFileSync(logFile, out.join("\n") + "\n");
 state[transcript] = end;
 fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+
+// auto-commit.js runs this logger and does its own commit, so it opts out here.
+if (out.length && !process.env.LOG_PROMPTS_NO_PUSH) pushLog();
+
+// Commit only the prompt log and push it to main. Skipped on any other branch,
+// so a ticket's pull request carries ticket files alone. Never force-pushes.
+function pushLog() {
+  const git = (...args) => spawnSync("git", args, { cwd: projectDir, encoding: "utf8" });
+  if (git("symbolic-ref", "--short", "-q", "HEAD").stdout.trim() !== "main") return;
+  // A pathspec commit leaves anything else in the index or working tree untouched.
+  if (git("commit", "-q", "-m", "Update prompt log", "--", ".claude/logs/prompts.jsonl").status !== 0) return;
+  if (git("push", "-q", "origin", "main").status === 0) return;
+  // Rejected because origin moved on: rebase onto it and retry once.
+  if (git("pull", "-q", "--rebase", "--autostash", "origin", "main").status !== 0) {
+    git("rebase", "--abort");
+    return;
+  }
+  git("push", "-q", "origin", "main");
+}
