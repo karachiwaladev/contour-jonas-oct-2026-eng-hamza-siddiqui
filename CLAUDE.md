@@ -29,6 +29,7 @@ Each project gets its own folder. Use `projects/<name>/` by default, or the exac
 ## Factory loop
 
 - `/factory-loop` (`.claude/skills/factory-loop/SKILL.md`): fetch open issues and react 👀. Question tickets are answered in a comment. Repo-work tickets are done, committed with `Closes #n` and pushed to `main`. Both kinds are then closed. Unsafe or unclear tickets are flagged for a human and left open.
+- Building a project or feature: clarify with the user → plan → get approval → build → verify in Chrome (`chrome-devtools` MCP, set up in `.mcp.json`) → push, with screenshots in `<project>/screenshots/` embedded on the ticket.
 - Run it on a schedule with `/loop 1m /factory-loop`.
 
 ## Project index
