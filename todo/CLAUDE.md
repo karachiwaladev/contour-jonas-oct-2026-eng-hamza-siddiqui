@@ -7,4 +7,5 @@ A simple todo app: create a task, mark it done, delete it (#4). Tasks also have 
 - **Filters:** kept in memory (`filters` in `app.js`) and applied on render. The tag dropdown is rebuilt from the tags in use; clicking a tag chip filters by it.
 - **Files:** `index.html` (markup), `app.js` (database helpers and rendering), `style.css`.
 - **Run:** open `index.html` in a browser, or serve the folder (for example `npx serve todo`).
+- **Screenshots:** `screenshots/issue-<n>-*.png`, one per requirement, taken in Chrome during verification.
 - **Test:** add a task with a due date and tags `work, urgent`. Tick it, then check that the Completed and Incomplete filters show it correctly. Pick `#work` in the tag filter, reload the page (the data persists), then delete the task.
