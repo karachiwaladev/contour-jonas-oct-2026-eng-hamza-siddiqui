@@ -86,6 +86,7 @@ The loop itself is a dispatcher. It fetches, skips, reacts, routes, and does the
 | New feature/project, answers given, plan changes | `ticket-planner` | issue, stage (`clarify`/`plan`/`revise`) | the comment URL |
 | Plan approved: red | `test-writer` | branch, project, plan's Tests + Modules | failing tests, required exports |
 | Green | `feature-builder` | branch, plan, test files | modules built, `node --test` green |
+| Check the claimed tests | the loop itself runs `.claude/evals/test-coverage.mjs` | test-writer's file list | PASS, or the fake files named |
 | Browser check | `browser-verifier` | project, issue, plan's Browser check | PASS/FAIL per check, screenshots |
 | Review (run both in parallel) | `code-reviewer`, `security-reviewer` | branch, plan | findings |
 | Fix findings | `feature-builder` (fix mode) | findings | fixes with tests |
@@ -167,6 +168,7 @@ Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**,
    ```
    - Write the approved unit tests first. Run `node --test` and confirm they **fail**.
    - Build until they **pass**. Then run the full `node --test` suite and check it's all green.
+   - **Coverage eval:** run `node .claude/evals/test-coverage.mjs --claimed <test-writer's files>` and require PASS. This proves the claimed tests really exercise the code. If it fails, send the report back to `test-writer` (`references/testing.md`).
    - Follow the layout rules in `CLAUDE.md` and `references/structure.md`:
      - **New project:** it goes in the folder the ticket names, or `projects/<name>/` by default. It gets its own short `CLAUDE.md` and a row in the root index.
      - **Existing project:** extend it module by module rather than rewriting it, keep stored data compatible, and never grow one big file.

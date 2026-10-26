@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the coverage eval diffs against the base branch
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -20,3 +22,8 @@ jobs:
         run: git ls-files '*.js' ':!:.claude/**' | xargs -r -n1 node --check
       - name: Unit tests
         run: node --test
+      - name: Coverage eval self-tests
+        run: node --test .claude/evals/test-coverage.test.mjs
+      - name: Coverage eval (new tests must add coverage)
+        if: github.event_name == 'pull_request'
+        run: node .claude/evals/test-coverage.mjs --base "origin/${{ github.base_ref }}"
