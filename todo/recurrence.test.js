@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { nextDue, completeTask, stopRepeating } from "./recurrence.js";
+import { nextDue, completeTask, reopenTask, stopRepeating, newRecurringFields } from "./recurrence.js";
 
 const TODAY = "2026-10-26";
 
@@ -56,6 +56,30 @@ test("completing a non-repeating task creates nothing", () => {
 test("an older task with no repeat field creates nothing", () => {
   const { repeat, ...old } = weekly;
   assert.equal(completeTask(old, TODAY).next, null);
+});
+
+test("monthly keeps its original day after a short month (no drift)", () => {
+  const rent = { title: "Pay rent", due: "2027-01-31", tags: [], repeat: "monthly", anchorDay: 31, done: false };
+  const feb = completeTask(rent, TODAY).next;
+  assert.equal(feb.due, "2027-02-28");
+  assert.equal(feb.anchorDay, 31);
+  assert.equal(completeTask({ ...feb, done: false }, TODAY).next.due, "2027-03-31");
+});
+
+test("newRecurringFields records the day a monthly series is anchored to", () => {
+  assert.deepEqual(newRecurringFields("2027-01-31", "monthly", TODAY), { repeat: "monthly", anchorDay: 31 });
+  assert.deepEqual(newRecurringFields("", "monthly", TODAY), { repeat: "monthly", anchorDay: 26 });
+  assert.deepEqual(newRecurringFields("2027-01-31", "weekly", TODAY), { repeat: "weekly" });
+  assert.deepEqual(newRecurringFields("2027-01-31", "", TODAY), { repeat: "" });
+});
+
+test("reopening a task that already spawned turns it into a one-off, so only one open copy repeats", () => {
+  const { updated } = completeTask(weekly, TODAY);
+  assert.deepEqual(reopenTask(updated), { ...weekly, done: false, spawned: true, repeat: "" });
+});
+
+test("reopening a task that never spawned keeps its repeat", () => {
+  assert.deepEqual(reopenTask({ ...weekly, done: true }), weekly);
 });
 
 test("after Stop repeating, completing creates nothing", () => {

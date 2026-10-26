@@ -1,13 +1,20 @@
 // Entry point: wires storage, logic and rendering to the page.
-import { openDb, addTask, listTasks, updateTask, deleteTask } from "./db.js";
+import { openDb, addTask, listTasks, changeTask, deleteTask } from "./db.js";
 import { parseTags, matches, tagsInUse } from "./tasks.js";
-import { completeTask, stopRepeating, toISODate } from "./recurrence.js";
+import { completeTask, reopenTask, stopRepeating, newRecurringFields, toISODate } from "./recurrence.js";
 import { renderTasks, renderTagOptions } from "./render.js";
 
 const $ = (id) => document.getElementById(id);
 const filters = { status: "all", tag: "" };
 
-const db = await openDb();
+let db;
+try {
+  db = await openDb();
+} catch (err) {
+  $("empty").textContent = "Storage is unavailable in this browser, so tasks can't be saved.";
+  $("new-task").querySelector("button[type=submit]").disabled = true;
+  throw err;
+}
 
 async function refresh() {
   const tasks = await listTasks(db);
@@ -24,13 +31,10 @@ async function refresh() {
 
 const handlers = {
   async toggle(task, checked) {
-    if (checked) {
-      const { updated, next } = completeTask(task, toISODate());
-      await updateTask(db, updated);
-      if (next) await addTask(db, next);
-    } else {
-      await updateTask(db, { ...task, done: false });
-    }
+    const today = toISODate();
+    await changeTask(db, task.id, (current) =>
+      checked ? completeTask(current, today) : { updated: reopenTask(current), next: null }
+    );
     refresh();
   },
   async remove(task) {
@@ -42,7 +46,7 @@ const handlers = {
     refresh();
   },
   async stopRepeating(task) {
-    await updateTask(db, stopRepeating(task));
+    await changeTask(db, task.id, (current) => ({ updated: stopRepeating(current), next: null }));
     refresh();
   },
 };
@@ -51,7 +55,9 @@ $("new-task").addEventListener("submit", async (e) => {
   e.preventDefault();
   const title = $("title").value.trim();
   if (!title) return;
-  await addTask(db, { title, due: $("due").value, tags: parseTags($("tags").value), repeat: $("repeat").value });
+  const due = $("due").value;
+  const recurring = newRecurringFields(due, $("repeat").value, toISODate());
+  await addTask(db, { title, due, tags: parseTags($("tags").value), ...recurring });
   e.target.reset();
   $("title").focus();
   refresh();

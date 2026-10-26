@@ -3,11 +3,11 @@
 import { isOverdue } from "./tasks.js";
 import { REPEATS } from "./recurrence.js";
 
-// Rebuild the tag dropdown, keeping `selected` if it is still in use.
+// Rebuild the tag dropdown. The caller makes sure `selected` is "" or a tag in `tags`.
 export function renderTagOptions(select, tags, selected) {
   const options = tags.map((tag) => new Option(`#${tag}`, tag));
   select.replaceChildren(new Option("All tags", ""), ...options);
-  select.value = tags.includes(selected) ? selected : "";
+  select.value = selected;
 }
 
 // on: { toggle(task, checked), remove(task), filterTag(tag), stopRepeating(task) }
