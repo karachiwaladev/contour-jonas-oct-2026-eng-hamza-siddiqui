@@ -1,6 +1,6 @@
 ---
 name: factory-loop
-description: Work through the open GitHub issues in the current repo like a ticket factory. For each one, react with 👀, then do what the ticket asks. It answers questions and also takes the action: creating or editing files, building or extending projects, opening follow-up issues, and anything else that can be done safely inside this repo. For a project or feature, it first asks clarifying questions and gets a plan approved in comments on the GitHub issue, then builds, verifies in Chrome through the chrome-devtools MCP, and attaches screenshots. Repo changes go on a branch and into a pull request that references the ticket, for a human to verify and merge; tickets that only need an answer are closed. It never takes destructive actions; tickets that would need one are flagged for a human. Use this whenever the user asks to process, triage, answer, work through or clear the repo's issues or tickets, says something like "handle the tickets" or "check for new issues and do them", or wants to poll for new issues on a schedule (for example `/loop 1m /factory-loop`).
+description: Work through the open GitHub issues in the current repo like a ticket factory. For each one, react with 👀, then do what the ticket asks. It answers questions and also takes the action: creating or editing files, building or extending projects, opening follow-up issues, and anything else that can be done safely inside this repo. For a project or feature, it first asks clarifying questions and gets a plan approved in comments on the GitHub issue, then writes failing unit tests first, builds small single-purpose modules until they pass, verifies in Chrome through the chrome-devtools MCP, runs a code review and a security review, and attaches tests, review results and screenshots. Repo changes go on a branch and into a pull request that references the ticket, for a human to verify and merge; tickets that only need an answer are closed. It never takes destructive actions; tickets that would need one are flagged for a human. Use this whenever the user asks to process, triage, answer, work through or clear the repo's issues or tickets, says something like "handle the tickets" or "check for new issues and do them", or wants to poll for new issues on a schedule (for example `/loop 1m /factory-loop`).
 ---
 
 # Factory loop
@@ -9,7 +9,7 @@ Process the open issues in the current repo's GitHub project, one at a time:
 
 **fetch → react 👀 → do the work (answer + act) → open a pull request → comment → close**
 
-To build a project or a feature, do the work in this order: **clarify on the issue → plan on the issue → get approval on the issue → build → verify in Chrome → open a pull request with screenshots**. All questions and approvals happen in GitHub issue comments, never in the session. Repo changes never go straight to `main`: they go on a branch and into a pull request, so a human can check the work and merge it. Step 5b has the details.
+To build a project or a feature, do the work in this order: **clarify on the issue → plan (with test cases) on the issue → get approval on the issue → write failing tests → build until they pass → verify in Chrome → code review + security review → open a pull request with tests, review and screenshots**. All questions and approvals happen in GitHub issue comments, never in the session. Repo changes never go straight to `main`: they go on a branch and into a pull request, so a human can check the work and merge it. Step 5b has the details.
 
 The ticket author wants the outcome, not a description of it. If a ticket says "build X", "add Y" or "create a ticket for Z", produce X, Y or Z. If it asks a question, answer it, and also do any action the question implies. The 👀 reaction says the ticket is picked up, the pushed commit or the created item is the work, and closing the issue marks it done. Only what is on GitHub counts.
 
@@ -55,7 +55,7 @@ gh api repos/{owner}/{repo}/pulls/{pr}/comments --jq '.[] | {created_at, path, b
 gh pr view {pr} --json reviews --jq '.reviews[] | {state, submittedAt, body}'
 ```
 
-Feedback newer than the factory's last push or comment means: check out the PR branch, make the fixes, verify again, push to the same branch, and reply on the PR. No new feedback means the PR is waiting for a human, so skip it. Once a human merges the PR, the `Closes #n` in it closes the ticket.
+Feedback newer than the factory's last push or comment means: check out the PR branch, make the fixes, rerun `node --test`, verify again, push to the same branch, and reply on the PR. No new feedback means the PR is waiting for a human, so skip it. Once a human merges the PR, the `Closes #n` in it closes the ticket.
 
 ## Step 3: React 👀
 
@@ -116,7 +116,12 @@ EOF
 
 ## Step 5b: Build files, projects and features
 
-Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) skip to step 6 below, so they still go through a pull request. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → build → verify in the browser → ship.** Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
+Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) skip to step 7 below, so they still go through a pull request. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → tests first → build → verify in the browser → review → ship.**
+
+Deeper guidance, read when the step needs it:
+- [references/testing.md](references/testing.md): tests first with `node --test`, and what goes in the PR's Tests section.
+- [references/structure.md](references/structure.md): how to split code into modules. No god objects or big controller files.
+- [references/review.md](references/review.md): the code review and security review run before every PR. Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
 
 Questions and approval happen **on the GitHub issue**, not in the session: don't use `AskUserQuestion`. Each step that needs a human posts a comment, leaves the issue open, and ends work on that ticket for this run. Step 2 picks the ticket back up once a human replies.
 
@@ -126,26 +131,32 @@ Questions and approval happen **on the GitHub issue**, not in the session: don't
    - Don't ask about things the ticket or the code already settles.
    - If nothing is genuinely open, skip the questions and go straight to the plan.
 2. **Plan.** Once the questions are answered, write a short plan that covers:
-   - the files to add or change;
-   - the data shape, and how older stored data stays compatible;
-   - the UI changes;
-   - how each ticket requirement will be checked in the browser.
+   - **Modules:** the files to add or change, and what each one is responsible for (`references/structure.md`). If a touched file is already too big, include splitting it.
+   - **Data:** the data shape, and how older stored data stays compatible.
+   - **UI:** what changes on screen.
+   - **Tests:** the unit test cases, each with an exact input and expected result (`references/testing.md`).
+   - **Browser check:** how each ticket requirement will be checked in Chrome.
 3. **Get approval.** Post the plan as an issue comment that ends by asking for a reply of **approve**, or for the changes wanted. Don't write code until a human approves it on the issue. If they ask for changes, post a revised plan and wait again.
-4. **Build** on a branch cut from the latest `main`:
+4. **Tests first, then build**, on a branch cut from the latest `main`:
    ```bash
    git switch main && git pull --ff-only origin main
    git switch -c factory/issue-{n}-<short-slug>
    ```
-   Follow the layout rules in `CLAUDE.md`:
-   - A new project goes in the folder the ticket names, or `projects/<name>/` by default. It gets its own short `CLAUDE.md` and a row in the root index.
-   - For an existing project, extend the code rather than rewrite it, and keep stored data compatible.
-   - Write working code, not stubs or TODOs. Run any build or test the project has, plus `node --check` for plain JavaScript.
+   - Write the approved unit tests first. Run `node --test` and confirm they **fail**.
+   - Build until they **pass**. Then run the full `node --test` suite and check it's all green.
+   - Follow the layout rules in `CLAUDE.md` and `references/structure.md`:
+     - **New project:** it goes in the folder the ticket names, or `projects/<name>/` by default. It gets its own short `CLAUDE.md` and a row in the root index.
+     - **Existing project:** extend it module by module rather than rewriting it, keep stored data compatible, and never grow one big file.
+   - Write working code, not stubs or TODOs. Run `node --check` on every changed JavaScript file.
    - Update the project's `CLAUDE.md` and the root index.
 5. **Verify in the browser** with the `chrome-devtools` MCP tools (see "Browser verification" below):
    - Exercise every requirement in the ticket and check the console for errors.
    - Save screenshots to `<project>/screenshots/issue-<n>-<step>.png`.
-   - If something fails, fix it and check again before going on.
-6. **Open a pull request.** Commit only this ticket's files, including the screenshots, on the ticket branch (create it now if step 4 was skipped). Push the branch and open a PR against `main`:
+   - If something fails, fix it, add a unit test for it if it's logic, and check again before going on.
+6. **Review.** Run the code review and the security review (`references/review.md`):
+   - Fix the real findings, then rerun `node --test`. If the UI changed, also redo the affected Chrome check.
+   - High or critical security findings block the PR.
+7. **Open a pull request.** Commit only this ticket's files, including the screenshots, on the ticket branch (create it now if step 4 was skipped). Push the branch and open a PR against `main`:
    ```bash
    git add <files> <project>/screenshots/issue-<n>-*.png
    git commit -m "<summary> (Closes #{n})"
@@ -156,14 +167,24 @@ Questions and approval happen **on the GitHub issue**, not in the session: don't
    Closes #{n}
 
    ## What changed
-   ...
+   ...modules and what each is responsible for...
+   ## Tests
+   ...test files, final `node --test` result...
+   ## Review
+   ...code review findings and fixes; security checklist results...
    ## How each requirement was verified
    ...screenshots...
    EOF
    git switch main
    ```
-   The PR body has what changed, how each requirement and constraint was met and verified, and the screenshots. Never force-push; if the branch push is rejected, pull with `--rebase` and push again. Switch back to `main` afterwards so the next ticket starts clean.
-7. **Embed the screenshots** in the PR body and the ticket comment with links pinned to the commit, so they render even when the repo is private:
+   The PR body covers:
+   - what changed;
+   - the tests and their final result;
+   - the code review and security review findings and how each was handled;
+   - how each requirement and constraint was met and verified, with the screenshots.
+
+   CI reruns `node --test` on the PR. Never force-push; if the branch push is rejected, pull with `--rebase` and push again. Switch back to `main` afterwards so the next ticket starts clean.
+8. **Embed the screenshots** in the PR body and the ticket comment with links pinned to the commit, so they render even when the repo is private:
    ```markdown
    ![Completed filter](https://github.com/{owner}/{repo}/blob/<sha>/todo/screenshots/issue-5-completed.png?raw=true)
    ```
@@ -218,7 +239,7 @@ Tickets with a step left for a human stay open.
 End with a short summary for the user, with one line per issue:
 
 - `#1 Largest city in Pakistan`: answered (Karachi), closed. Include a link to the comment.
-- `#4 Todo app`: built `todo/` (IndexedDB) after Q&A and an approved plan on the issue, verified in Chrome (3 screenshots), opened PR #10 for review. Left open until it's merged.
+- `#4 Todo app`: built `todo/` (IndexedDB) after Q&A and an approved plan on the issue. 12 unit tests passing, verified in Chrome (3 screenshots), code and security review clean. Opened PR #10 for review, left open until it's merged.
 - `#9 Dark mode`: posted 3 clarifying questions on the issue. Waiting for a reply, left open.
 - `#6 Ask about the smallest city`: created #7 with the question and answered it there, closed.
 - `#8 Delete the old app`: needs a human (destructive). Left open.
