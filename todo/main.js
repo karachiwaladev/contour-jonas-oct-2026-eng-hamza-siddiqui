@@ -3,12 +3,14 @@ import { openDb, addTask, listTasks, changeTask, deleteTask } from "./db.js";
 import { parseTags, matches, tagsInUse } from "./tasks.js";
 import { completeTask, reopenTask, stopRepeating, newRecurringFields, toISODate } from "./recurrence.js";
 import { normalizePriority, sortTasks } from "./priority.js";
-import { validateEdit, applyEdit } from "./edit.js";
+import { validateEdit, applyEdit, keepEditing } from "./edit.js";
 import { renderTasks, renderTagOptions } from "./render.js";
+import { renderPriorityOptions, bindFilters } from "./controls.js";
 
 const $ = (id) => document.getElementById(id);
 const filters = { status: "all", tag: "", priority: "" };
 let editingId = null; // id of the task shown as an edit form, if any
+renderPriorityOptions($("priority"), $("priority-filter"));
 
 let db;
 try {
@@ -24,8 +26,10 @@ async function refresh() {
   const tags = tagsInUse(tasks);
   if (!tags.includes(filters.tag)) filters.tag = "";
   renderTagOptions($("tag-filter"), tags, filters.tag);
+  const visible = sortTasks(tasks.filter((t) => matches(t, filters)));
+  editingId = keepEditing(visible, editingId);
   renderTasks($("tasks"), $("empty"), {
-    visible: sortTasks(tasks.filter((t) => matches(t, filters))),
+    visible,
     total: tasks.length,
     today: toISODate(),
     editingId,
@@ -87,21 +91,10 @@ $("new-task").addEventListener("submit", async (e) => {
   refresh();
 });
 
-const statusButtons = document.querySelectorAll("[data-status]");
-statusButtons.forEach((btn) =>
-  btn.addEventListener("click", () => {
-    filters.status = btn.dataset.status;
-    statusButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-    refresh();
-  })
+bindFilters(
+  { statusButtons: document.querySelectorAll("[data-status]"), tagSelect: $("tag-filter"), prioritySelect: $("priority-filter") },
+  filters,
+  refresh
 );
-$("tag-filter").addEventListener("change", (e) => {
-  filters.tag = e.target.value;
-  refresh();
-});
-$("priority-filter").addEventListener("change", (e) => {
-  filters.priority = e.target.value;
-  refresh();
-});
 
 refresh();
