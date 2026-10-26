@@ -197,7 +197,7 @@ Each tick runs this skill once. Because of the check in Step 2, issues that are 
 
 ## Auto commit and push
 
-Once `.claude/hooks/auto-commit.js` is installed and registered as a Stop hook (not set up yet; it needs the user's approval), it runs at the end of every turn. Until then, commit and push each ticket yourself.
+`.claude/hooks/auto-commit.js` runs at the end of every turn once it is registered as the Stop hook in `.claude/settings.json`, replacing the `log-prompts.js` entry, since it runs that logger itself. Only a human can register it, because the factory never edits its own settings. Until it is registered, commit and push each ticket yourself.
 - **What it does:** logs the session's prompts, then commits all non-ignored changes and pushes them to the current branch.
 - **What it never does:** force-push or rewrite history.
 - **If the push is rejected:** it pulls with `--rebase --autostash` and tries once more. If that fails, it aborts the rebase and reports the problem.

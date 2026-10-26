@@ -33,3 +33,62 @@
 {"timestamp":"2026-10-26T07:03:17.055Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4a6bd8f6-e996-43f1-bbdb-e823d2c796f5","prompt":"/factory-loop"}
 {"timestamp":"2026-10-26T07:04:17.120Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4e611551-a3dd-4fbd-92dc-816198902d9e","prompt":"/factory-loop"}
 {"timestamp":"2026-10-26T07:05:17.216Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"80163571-2579-4ad5-8a8a-6b004bcdd5f9","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:05:25.036Z","session_id":"e265ed85-e47c-4b2b-bd40-de9fe2a13958","prompt_id":"5d344a49-fb2a-428b-a911-dfc241375375","prompt":"done"}
+{"timestamp":"2026-10-26T07:06:17.298Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4c812031-38b0-4512-992c-07fa349f7326","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:07:17.434Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"12d318f7-d771-4b53-9a90-a633364a6ae3","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:08:56.708Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"da34c8c4-7f86-4fbd-8d6e-b20a63e78149","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:09:16.738Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"c38b115d-71df-4622-ae04-dd3edc04dbf9","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:11:02.910Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"639187a9-138a-461a-83a5-0d9a298103c1","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:11:50.932Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"5f5b2602-a81a-4cf1-857c-f2e4e8286e61","prompt":"If my work requires building a project or a feature in one of the projects, I would like you to first ask questions to clarify any assumptions, then plan the feature and get approval, then build and finally use chrome-devtools to run and verify everything in the browser. Attach screenshots with the ticket for the work done. Update the factory loop to do this as well."}
+{"timestamp":"2026-10-26T07:14:13.194Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"c6078c76-27ef-4c27-981f-babce52ff7dc","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:15:17.268Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"f1cda4c8-2bc1-4796-9881-830eb8404aab","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:16:17.310Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"cfb3ca4f-6451-4eb3-9274-49c8088a24ed","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:17:17.418Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"30960abf-b7a3-4db8-8af2-17b276479a86","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:18:17.474Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"838872b0-07a7-44bc-9c34-923dc5b1d711","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:19:17.523Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"ae717dc8-f19d-4922-a1c4-b9a215c3052f","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:12:42.886Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"5d0d5055-fee4-455c-99a5-ea7ed064f137","prompt":"/loop 1 min say hello world with time"}
+{"timestamp":"2026-10-26T06:16:20.735Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"2b792fe7-e42b-44f8-92d1-f8580b88fd64","prompt":"stop the loop"}
+{"timestamp":"2026-10-26T06:17:35.566Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"f1ab1ca2-bd64-4379-82c9-94b16684a16e","prompt":"please fetch the issues from my repo"}
+{"timestamp":"2026-10-26T06:22:18.885Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"99381c3b-67a5-49e1-812b-661a95482063","prompt":"lets react to the ticket or comment with an emoji. this will show me we are working on it"}
+{"timestamp":"2026-10-26T06:24:39.872Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"ed47559a-424c-4a5f-922f-43086f894915","prompt":"please read the wquestion and ticket and responfd to it as a commonent"}
+{"timestamp":"2026-10-26T06:28:12.960Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"d3d1c9b6-d1a1-4feb-8284-2d78e5d4ebca","prompt":"should we close  the issue as answered."}
+{"timestamp":"2026-10-26T06:29:39.981Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"3e1d7b81-fe6a-4980-8d11-0d26a4c61981","prompt":"2."}
+{"timestamp":"2026-10-26T06:33:06.042Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"482c2ed6-1893-4a2d-9275-0abbad7bc454","prompt":"I want to create a skill called factory-loop using the work I have done in this session"}
+{"timestamp":"2026-10-26T06:42:21.564Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"d3ee908d-f98c-4997-82f8-89f7108a5455","prompt":"/loop factory loop skill"}
+{"timestamp":"2026-10-26T06:42:41.658Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"2b0a159a-b6ce-4610-a3c1-97b61ee1f2cb","prompt":"stop"}
+{"timestamp":"2026-10-26T06:42:57.257Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"60e824a9-ca9e-48d3-b191-aa6319e689dd","prompt":"/loop every minute skill factory-loop"}
+{"timestamp":"2026-10-26T06:44:17.025Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"7fb38257-c8fc-4434-abfb-6d846af7a4ae","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:45:17.086Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"bb002e4f-3875-4aa7-8cab-70d0e2f212dd","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:46:17.248Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"84380506-eed2-4b95-bc12-51102c0d135f","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:47:17.307Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"e6f03cb3-e302-4e95-a2c5-81a9a6c70e54","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:48:17.449Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"ec1af507-7945-4a38-b757-e48f94d2c06d","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:49:17.498Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"8dc3a83a-02ce-4205-b544-24ff354b5b7c","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:50:17.567Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"9934f0f3-3d66-4560-adad-dc6439dbfa1a","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:51:16.634Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"a67817a7-6b21-4068-b5c2-355cb5b26db5","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:51:59.300Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"e424c836-a53b-423b-80e5-eeaffc389545","prompt":"yes go ahead"}
+{"timestamp":"2026-10-26T06:53:43.916Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"661dc942-5f56-4bfc-8821-d54ce188995a","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:54:16.947Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4aa17dfe-9510-4f42-b28e-329df8557f5b","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:54:47.098Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"da38a860-3494-4ba8-ace7-d55fabb542f6","prompt":"I would like to configure a hook which write all the new prompts in my session on every stop. Use a JSONL format."}
+{"timestamp":"2026-10-26T06:56:14.318Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"3dcaf5e1-3859-460d-afab-c65f6f74de03","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:57:17.405Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"44b81dd4-8c50-45cc-ac1b-8b9b02bb7671","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:58:17.472Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"62791f95-c712-4586-9b0a-ddb7c02d9d43","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T06:59:17.590Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"75f763de-d116-46ff-839a-7a70349d2c56","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:00:16.674Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"cd4a4332-6bf2-4c3f-ad43-04e4fd38dd44","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:01:16.762Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"3301c5d8-5e59-40b0-a80b-3c727a37711e","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:02:37.979Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"be306c4b-02b3-47b7-8b8c-bc3cd509659a","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:03:17.055Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4a6bd8f6-e996-43f1-bbdb-e823d2c796f5","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:04:17.120Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4e611551-a3dd-4fbd-92dc-816198902d9e","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:05:17.216Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"80163571-2579-4ad5-8a8a-6b004bcdd5f9","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:06:17.298Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"4c812031-38b0-4512-992c-07fa349f7326","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:07:17.434Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"12d318f7-d771-4b53-9a90-a633364a6ae3","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:08:56.708Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"da34c8c4-7f86-4fbd-8d6e-b20a63e78149","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:09:16.738Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"c38b115d-71df-4622-ae04-dd3edc04dbf9","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:11:02.910Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"639187a9-138a-461a-83a5-0d9a298103c1","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:11:50.932Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"5f5b2602-a81a-4cf1-857c-f2e4e8286e61","prompt":"If my work requires building a project or a feature in one of the projects, I would like you to first ask questions to clarify any assumptions, then plan the feature and get approval, then build and finally use chrome-devtools to run and verify everything in the browser. Attach screenshots with the ticket for the work done. Update the factory loop to do this as well."}
+{"timestamp":"2026-10-26T07:14:13.194Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"c6078c76-27ef-4c27-981f-babce52ff7dc","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:15:17.268Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"f1cda4c8-2bc1-4796-9881-830eb8404aab","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:16:17.310Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"cfb3ca4f-6451-4eb3-9274-49c8088a24ed","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:17:17.418Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"30960abf-b7a3-4db8-8af2-17b276479a86","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:18:17.474Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"838872b0-07a7-44bc-9c34-923dc5b1d711","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:19:17.523Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"ae717dc8-f19d-4922-a1c4-b9a215c3052f","prompt":"/factory-loop"}
+{"timestamp":"2026-10-26T07:19:55.509Z","session_id":"0c896632-2aff-4e63-9e63-9b32d72a8e23","prompt_id":"58fe3d90-195c-43b5-9400-2f462e73e66b","prompt":"retry auto commit hook, commit, restert session"}
