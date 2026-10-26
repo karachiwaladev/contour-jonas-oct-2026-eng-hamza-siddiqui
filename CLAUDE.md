@@ -20,6 +20,7 @@ When something grows past a few lines here, move it down a layer and leave a one
 CLAUDE.md                 # this file: the base index (<100 lines)
 README.md                 # workshop rules and scoring
 .claude/skills/           # the factory's reusable workflows
+.claude/agents/           # subagents the factory loop dispatches to
 projects/<name>/          # one folder per project
   CLAUDE.md               # project-level context (layer 2)
 ```
@@ -30,6 +31,13 @@ Each project gets its own folder. Use `projects/<name>/` by default, or the exac
 
 - `/factory-loop` (`.claude/skills/factory-loop/SKILL.md`): fetch open issues and react 👀. Question tickets are answered in a comment and closed. Repo-work tickets are done on a branch and opened as a pull request with `Closes #n`, so they close when a human merges it. Unsafe or unclear tickets are flagged for a human and left open.
 - Building a project or feature: clarify → plan with test cases → get approval (all as comments on the GitHub issue) → failing unit tests → build until green → verify in Chrome (`chrome-devtools` MCP, set up in `.mcp.json`) → code review + security review → pull request, with screenshots in `<project>/screenshots/` embedded in the PR and on the ticket.
+- The loop dispatches each stage to a subagent in `.claude/agents/`:
+  - `ticket-answerer` answers question-only tickets;
+  - `ticket-planner` handles questions and the plan;
+  - `test-writer` writes the failing tests;
+  - `feature-builder` builds until the tests pass;
+  - `browser-verifier` does the Chrome check;
+  - `code-reviewer` and `security-reviewer` review the branch.
 - Run it on a schedule with `/loop 1m /factory-loop`.
 
 ## Project index
