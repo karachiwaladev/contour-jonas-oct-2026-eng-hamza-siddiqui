@@ -24,7 +24,7 @@ projects/<name>/          # one folder per project
   CLAUDE.md               # project-level context (layer 2)
 ```
 
-Each project gets its own folder under `projects/`. Projects never share files. Anything shared becomes a skill in `.claude/skills/`.
+Each project gets its own folder. Use `projects/<name>/` by default, or the exact folder the ticket names (for example `todo/`). Projects never share files. Anything shared becomes a skill in `.claude/skills/`.
 
 ## Factory loop
 
@@ -37,11 +37,11 @@ Update this table whenever a project is added, renamed or retired.
 
 | Project | Folder | Purpose | Status |
 |---------|--------|---------|--------|
-| _(none yet)_ | | | |
+| Todo app | `todo/` | Create, complete and delete tasks; stored in IndexedDB (#4) | Done |
 
 ### Adding a project
 
-1. Create `projects/<name>/` with a short `CLAUDE.md` covering purpose, stack, how to run, and how to test.
+1. Create the project folder with a short `CLAUDE.md` covering purpose, stack, how to run, and how to test.
 2. Add a row to the index above.
 3. Link the ticket that created it in the commit message.
 
