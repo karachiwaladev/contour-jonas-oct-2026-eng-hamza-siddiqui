@@ -116,12 +116,12 @@ EOF
 
 ## Step 5b: Build files, projects and features
 
-Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) skip to step 7 below, so they still go through a pull request. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → tests first → build → verify in the browser → review → ship.**
+Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) skip to step 7 below, so they still go through a pull request. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → tests first → build → verify in the browser → review → ship.** Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
 
 Deeper guidance, read when the step needs it:
 - [references/testing.md](references/testing.md): tests first with `node --test`, and what goes in the PR's Tests section.
 - [references/structure.md](references/structure.md): how to split code into modules. No god objects or big controller files.
-- [references/review.md](references/review.md): the code review and security review run before every PR. Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
+- [references/review.md](references/review.md): the code review and security review run before every PR.
 
 Questions and approval happen **on the GitHub issue**, not in the session: don't use `AskUserQuestion`. Each step that needs a human posts a comment, leaves the issue open, and ends work on that ticket for this run. Step 2 picks the ticket back up once a human replies.
 
