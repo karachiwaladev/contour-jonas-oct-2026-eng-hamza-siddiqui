@@ -24,6 +24,17 @@ jobs:
         run: node --test
       - name: Coverage eval self-tests
         run: node --test .claude/evals/test-coverage.test.mjs
+      - name: PR risk eval self-tests
+        run: node --test .claude/evals/pr-risk.test.mjs
       - name: Coverage eval (new tests must add coverage)
         if: github.event_name == 'pull_request'
         run: node .claude/evals/test-coverage.mjs --base "origin/${{ github.base_ref }}"
+      - name: PR risk eval (report only)
+        if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo '### PR risk'
+            echo '```'
+            node .claude/evals/pr-risk.mjs --base "origin/${{ github.base_ref }}" --head HEAD
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"

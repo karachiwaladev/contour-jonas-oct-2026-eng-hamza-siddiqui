@@ -21,7 +21,7 @@ CLAUDE.md                 # this file: the base index (<100 lines)
 README.md                 # workshop rules and scoring
 .claude/skills/           # the factory's reusable workflows
 .claude/agents/           # subagents the factory loop dispatches to
-.claude/evals/            # deterministic checks on agent work (test-coverage.mjs)
+.claude/evals/            # deterministic checks on agent work (test-coverage.mjs, pr-risk.mjs)
 projects/<name>/          # one folder per project
   CLAUDE.md               # project-level context (layer 2)
 ```
@@ -61,6 +61,7 @@ Update this table whenever a project is added, renamed or retired.
 - Reference the ticket in commits and PR bodies (for example `Closes #3`).
 - **Tests first.** Unit tests use `node --test`, are written before the code, and must all pass before a PR. CI runs them on every PR.
 - **Coverage eval.** `node .claude/evals/test-coverage.mjs` checks that claimed tests really add coverage, comparing coverage with and without them. Fake or empty tests fail it. It runs in the loop and in CI.
+- **Risk eval before every PR.** `node .claude/evals/pr-risk.mjs` scores the branch: modules and lines changed, blast radius, storage, security, dependencies and tests. The level goes in the PR body and a `risk:<level>` label. It doesn't block.
 - **No god objects.** One responsibility per module (storage, pure logic, rendering, a thin `main.js`), using ES modules. See `.claude/skills/factory-loop/references/structure.md`.
 - **Review before the PR:** a code review and a security review (no `innerHTML` with data, a CSP, no secrets). See `references/review.md`.
 - Training repo only: no Jonas or Contour code, and no real keys or secrets.

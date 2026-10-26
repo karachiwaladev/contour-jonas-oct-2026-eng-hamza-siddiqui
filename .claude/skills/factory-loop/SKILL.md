@@ -90,6 +90,7 @@ The loop itself is a dispatcher. It fetches, skips, reacts, routes, and does the
 | Browser check | `browser-verifier` | project, issue, plan's Browser check | PASS/FAIL per check, screenshots |
 | Review (run both in parallel) | `code-reviewer`, `security-reviewer` | branch, plan | findings |
 | Fix findings | `feature-builder` (fix mode) | findings | fixes with tests |
+| Score the PR's risk | the loop itself runs `.claude/evals/pr-risk.mjs` | the committed branch | level, score, signals |
 
 - **Mixed ticket:** run each part through its own subagent.
 - **Small doc or config change:** do it directly. A subagent isn't worth it.
@@ -181,6 +182,7 @@ Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**,
 6. **Review.** Run the code review and the security review (`references/review.md`):
    - Fix the real findings, then rerun `node --test`. If the UI changed, also redo the affected Chrome check.
    - High or critical security findings block the PR.
+   - **Risk eval:** after the fixes and before the PR, commit and score the branch with `node .claude/evals/pr-risk.mjs --base main --head HEAD` (`references/review.md`). Its level and signals go in the PR's **Risk** section and in a `risk:<level>` label. It doesn't block. High means the human should review with extra care, and the PR body says what drives the score and whether the change could be split.
 7. **Open a pull request.** Commit only this ticket's files, including the screenshots, on the ticket branch (create it now if step 4 was skipped). Push the branch and open a PR against `main`:
    ```bash
    git add <files> <project>/screenshots/issue-<n>-*.png
@@ -197,6 +199,8 @@ Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**,
    ...test files, final `node --test` result...
    ## Review
    ...code review findings and fixes; security checklist results...
+   ## Risk
+   ...pr-risk level, score and signals...
    ## How each requirement was verified
    ...screenshots...
    EOF
@@ -208,7 +212,13 @@ Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**,
    - the code review and security review findings and how each was handled;
    - how each requirement and constraint was met and verified, with the screenshots.
 
-   CI reruns `node --test` on the PR. Never force-push; if the branch push is rejected, pull with `--rebase` and push again. Switch back to `main` afterwards so the next ticket starts clean.
+   Label the PR with its risk level (`--force` creates the label or keeps it up to date):
+   ```bash
+   gh label create "risk:<level>" --repo {owner}/{repo} --color <low: 0e8a16, medium: fbca04, high: d93f0b> --force
+   gh pr edit <pr> --repo {owner}/{repo} --add-label "risk:<level>"
+   ```
+
+   CI reruns `node --test` on the PR and posts the risk report in the run summary. Never force-push; if the branch push is rejected, pull with `--rebase` and push again. Switch back to `main` afterwards so the next ticket starts clean.
 8. **Embed the screenshots** in the PR body and the ticket comment with links pinned to the commit, so they render even when the repo is private:
    ```markdown
    ![Completed filter](https://github.com/{owner}/{repo}/blob/<sha>/todo/screenshots/issue-5-completed.png?raw=true)
