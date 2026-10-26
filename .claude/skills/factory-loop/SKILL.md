@@ -1,15 +1,15 @@
 ---
 name: factory-loop
-description: Work through the open GitHub issues in the current repo like a ticket factory. For each one, react with 👀, then do what the ticket asks. It answers questions and also takes the action: creating or editing files, building or extending projects, opening follow-up issues, and anything else that can be done safely inside this repo. For a project or feature, it first asks clarifying questions and gets a plan approved in comments on the GitHub issue, then builds, verifies in Chrome through the chrome-devtools MCP, and attaches screenshots to the ticket. It commits with the ticket referenced, pushes to main, comments, and closes. It never takes destructive actions; tickets that would need one are flagged for a human. Use this whenever the user asks to process, triage, answer, work through or clear the repo's issues or tickets, says something like "handle the tickets" or "check for new issues and do them", or wants to poll for new issues on a schedule (for example `/loop 1m /factory-loop`).
+description: Work through the open GitHub issues in the current repo like a ticket factory. For each one, react with 👀, then do what the ticket asks. It answers questions and also takes the action: creating or editing files, building or extending projects, opening follow-up issues, and anything else that can be done safely inside this repo. For a project or feature, it first asks clarifying questions and gets a plan approved in comments on the GitHub issue, then builds, verifies in Chrome through the chrome-devtools MCP, and attaches screenshots. Repo changes go on a branch and into a pull request that references the ticket, for a human to verify and merge; tickets that only need an answer are closed. It never takes destructive actions; tickets that would need one are flagged for a human. Use this whenever the user asks to process, triage, answer, work through or clear the repo's issues or tickets, says something like "handle the tickets" or "check for new issues and do them", or wants to poll for new issues on a schedule (for example `/loop 1m /factory-loop`).
 ---
 
 # Factory loop
 
 Process the open issues in the current repo's GitHub project, one at a time:
 
-**fetch → react 👀 → do the work (answer + act) → push → comment → close**
+**fetch → react 👀 → do the work (answer + act) → open a pull request → comment → close**
 
-To build a project or a feature, do the work in this order: **clarify on the issue → plan on the issue → get approval on the issue → build → verify in Chrome → push with screenshots**. All questions and approvals happen in GitHub issue comments, never in the session. Step 5b has the details.
+To build a project or a feature, do the work in this order: **clarify on the issue → plan on the issue → get approval on the issue → build → verify in Chrome → open a pull request with screenshots**. All questions and approvals happen in GitHub issue comments, never in the session. Repo changes never go straight to `main`: they go on a branch and into a pull request, so a human can check the work and merge it. Step 5b has the details.
 
 The ticket author wants the outcome, not a description of it. If a ticket says "build X", "add Y" or "create a ticket for Z", produce X, Y or Z. If it asks a question, answer it, and also do any action the question implies. The 👀 reaction says the ticket is picked up, the pushed commit or the created item is the work, and closing the issue marks it done. Only what is on GitHub counts.
 
@@ -38,13 +38,24 @@ Without this check, a looping run would work the same ticket again and again. Fo
 gh api repos/{owner}/{repo}/issues/{n}/reactions --jq '[.[] | select(.content=="eyes") | .user.login]'
 ```
 
-If the current user has already reacted 👀 and the issue is still open, an earlier run is waiting on a human: it asked questions, posted a plan for approval, or flagged the ticket. Fetch the comments:
+If the current user has already reacted 👀 and the issue is still open, an earlier run is waiting on a human: it asked questions, posted a plan for approval, opened a pull request for review, or flagged the ticket. Fetch the comments:
 
 ```bash
 gh api repos/{owner}/{repo}/issues/{n}/comments --jq '.[] | {user: .user.login, created_at, body}'
 ```
 
 The factory may post as the same account as the human, so tell its comments apart by the `<!-- factory-loop -->` marker on their first line (see Step 5a). If no comment without the marker came after the last marked one, skip the issue. Otherwise a human has replied: re-read the ticket and the whole thread, then carry on from where it stopped. An answer to questions leads to the plan; an approval ("approve", "go ahead", "lgtm") leads to the build; requested changes lead to a revised plan.
+
+If the ticket has an open factory pull request, also check it for review feedback:
+
+```bash
+gh pr list --state open --search "Closes #{n} in:body" --json number,headRefName,url
+gh api repos/{owner}/{repo}/issues/{pr}/comments --jq '.[] | {created_at, body}'
+gh api repos/{owner}/{repo}/pulls/{pr}/comments --jq '.[] | {created_at, path, body}'
+gh pr view {pr} --json reviews --jq '.reviews[] | {state, submittedAt, body}'
+```
+
+Feedback newer than the factory's last push or comment means: check out the PR branch, make the fixes, verify again, push to the same branch, and reply on the PR. No new feedback means the PR is waiting for a human, so skip it. Once a human merges the PR, the `Closes #n` in it closes the ticket.
 
 ## Step 3: React 👀
 
@@ -59,7 +70,7 @@ Read the title and body together, because the title is often just a label. List 
 | The ticket asks for… | Do this |
 |---|---|
 | An answer to a question | Answer in a comment (Step 5a) |
-| Files, docs, config or code; a new project; a feature in an existing project | Build it, commit and push (Step 5b) |
+| Files, docs, config or code; a new project; a feature in an existing project | Build it on a branch and open a pull request (Step 5b) |
 | A new issue, label, or other GitHub item in **this** repo | Create it with `gh` (Step 5c) |
 | A mix of the above | Do all of it, then report everything in one comment |
 
@@ -72,6 +83,7 @@ You may create, add to and edit things freely. Before any action, check that it 
 - **Delete or empty** files or folders that existed before this ticket, or overwrite a file wholesale in a way that loses content someone wrote. Editing to change behaviour is fine.
 - **Rewrite git history**: no `push --force`, `reset --hard`, rebasing or amending pushed commits, `git clean`, or `git checkout -- <file>` on someone else's changes.
 - **Delete GitHub items**: branches, tags, releases, issues, comments, labels or the repo itself. Don't close or edit issues other than the one you're handling, apart from items you created.
+- **Merge or bypass review**: never merge, approve or close a pull request, and never push ticket work straight to `main`. A human verifies and merges.
 - **Change the factory's guardrails**: `.claude/settings*.json`, hooks, permissions or CI secrets.
 - **Leave this repo**: no changes to other repos or external systems, no deployments, no global installs, and nothing that needs credentials you don't have.
 - **Expose secrets**: never put real keys or tokens in files or comments.
@@ -104,7 +116,7 @@ EOF
 
 ## Step 5b: Build files, projects and features
 
-Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) go straight to step 5 below. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → build → verify in the browser → ship.** Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
+Small file or doc changes (a README, a config tweak, a `CLAUDE.md` edit) skip to step 6 below, so they still go through a pull request. **Building a project, or a feature in one, follows the full flow: clarify → plan → approve → build → verify in the browser → ship.** Don't skip ahead: a wrong assumption caught in a question costs far less than one found after building.
 
 Questions and approval happen **on the GitHub issue**, not in the session: don't use `AskUserQuestion`. Each step that needs a human posts a comment, leaves the issue open, and ends work on that ticket for this run. Step 2 picks the ticket back up once a human replies.
 
@@ -119,7 +131,12 @@ Questions and approval happen **on the GitHub issue**, not in the session: don't
    - the UI changes;
    - how each ticket requirement will be checked in the browser.
 3. **Get approval.** Post the plan as an issue comment that ends by asking for a reply of **approve**, or for the changes wanted. Don't write code until a human approves it on the issue. If they ask for changes, post a revised plan and wait again.
-4. **Build.** Follow the layout rules in `CLAUDE.md`:
+4. **Build** on a branch cut from the latest `main`:
+   ```bash
+   git switch main && git pull --ff-only origin main
+   git switch -c factory/issue-{n}-<short-slug>
+   ```
+   Follow the layout rules in `CLAUDE.md`:
    - A new project goes in the folder the ticket names, or `projects/<name>/` by default. It gets its own short `CLAUDE.md` and a row in the root index.
    - For an existing project, extend the code rather than rewrite it, and keep stored data compatible.
    - Write working code, not stubs or TODOs. Run any build or test the project has, plus `node --check` for plain JavaScript.
@@ -128,14 +145,25 @@ Questions and approval happen **on the GitHub issue**, not in the session: don't
    - Exercise every requirement in the ticket and check the console for errors.
    - Save screenshots to `<project>/screenshots/issue-<n>-<step>.png`.
    - If something fails, fix it and check again before going on.
-6. **Ship.** Commit only this ticket's files, including the screenshots, with the ticket number in the message, and push straight to `main`. The workshop scores `main`.
+6. **Open a pull request.** Commit only this ticket's files, including the screenshots, on the ticket branch (create it now if step 4 was skipped). Push the branch and open a PR against `main`:
    ```bash
    git add <files> <project>/screenshots/issue-<n>-*.png
    git commit -m "<summary> (Closes #{n})"
-   git push origin main
+   git push -u origin factory/issue-{n}-<short-slug>
+   gh pr create --repo {owner}/{repo} --base main --head factory/issue-{n}-<short-slug> \
+     --title "<summary> (#{n})" --body-file - <<'EOF'
+   <!-- factory-loop -->
+   Closes #{n}
+
+   ## What changed
+   ...
+   ## How each requirement was verified
+   ...screenshots...
+   EOF
+   git switch main
    ```
-   If the push is rejected, run `git pull --rebase` and push again. Never force-push.
-7. **Comment with the screenshots.** In the ticket comment (Step 6), embed each screenshot with a link pinned to the commit, so it renders on the issue even when the repo is private:
+   The PR body has what changed, how each requirement and constraint was met and verified, and the screenshots. Never force-push; if the branch push is rejected, pull with `--rebase` and push again. Switch back to `main` afterwards so the next ticket starts clean.
+7. **Embed the screenshots** in the PR body and the ticket comment with links pinned to the commit, so they render even when the repo is private:
    ```markdown
    ![Completed filter](https://github.com/{owner}/{repo}/blob/<sha>/todo/screenshots/issue-5-completed.png?raw=true)
    ```
@@ -155,7 +183,7 @@ Questions and approval happen **on the GitHub issue**, not in the session: don't
 
 If the `chrome-devtools` tools aren't available in the session (the server is configured in `.mcp.json` and loads when a session starts), say so to the user. Verify what you can without a browser, and say in the ticket comment that browser verification was skipped.
 
-The Stop hook may also commit and push anything left over at the end of a turn (see below). Still commit each ticket yourself, so its commit carries `Closes #n` and a clear message.
+The Stop hook may also commit and push anything left over at the end of a turn to the current branch (see below). Still commit each ticket yourself on its branch, so its commit carries `Closes #n` and a clear message.
 
 ## Step 5c: Create GitHub items in this repo
 
@@ -173,24 +201,24 @@ Link anything you create from the original ticket's comment (`Created #12`). Nev
 
 Comment on the ticket with:
 - what you did;
-- links to the commit and to anything you created;
+- links to the pull request, the commit and anything you created;
 - how each constraint was met;
-- anything left for a human.
+- anything left for a human. For repo work, that is always reviewing and merging the PR.
 
-Then close the ticket if everything it asked for is done:
+**Tickets with a pull request stay open.** Merging the PR closes them through `Closes #n`. Close a ticket yourself only when it needed no repo change (an answer, a created issue) and everything it asked for is done:
 
 ```bash
 gh issue close {n} --repo {owner}/{repo} --reason completed
 ```
 
-A `Closes #n` commit on `main` may already have closed it, so check `gh issue view {n} --json state` first. Tickets with a step left for a human stay open.
+Tickets with a step left for a human stay open.
 
 ## Step 7: Report
 
 End with a short summary for the user, with one line per issue:
 
 - `#1 Largest city in Pakistan`: answered (Karachi), closed. Include a link to the comment.
-- `#4 Todo app`: built `todo/` (IndexedDB) after Q&A and an approved plan on the issue, verified in Chrome (3 screenshots), pushed `c1df3ad`, closed.
+- `#4 Todo app`: built `todo/` (IndexedDB) after Q&A and an approved plan on the issue, verified in Chrome (3 screenshots), opened PR #10 for review. Left open until it's merged.
 - `#9 Dark mode`: posted 3 clarifying questions on the issue. Waiting for a reply, left open.
 - `#6 Ask about the smallest city`: created #7 with the question and answered it there, closed.
 - `#8 Delete the old app`: needs a human (destructive). Left open.
@@ -208,7 +236,7 @@ Each tick runs this skill once. Because of the check in Step 2, issues that are 
 ## Auto commit and push
 
 `.claude/hooks/auto-commit.js` runs at the end of every turn once it is registered as the Stop hook in `.claude/settings.json`, replacing the `log-prompts.js` entry, since it runs that logger itself. Only a human can register it, because the factory never edits its own settings. Until it is registered, commit and push each ticket yourself.
-- **What it does:** logs the session's prompts, then commits all non-ignored changes and pushes them to the current branch.
+- **What it does:** logs the session's prompts, then commits all non-ignored changes and pushes them to the current branch. That is why each run switches back to `main` once its PR is open.
 - **What it never does:** force-push or rewrite history.
 - **If the push is rejected:** it pulls with `--rebase --autostash` and tries once more. If that fails, it aborts the rebase and reports the problem.
 - **When it does nothing:** during a merge or rebase, when HEAD is detached, and when the only change is the prompt log.
