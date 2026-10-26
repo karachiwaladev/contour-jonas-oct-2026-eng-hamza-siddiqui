@@ -22,7 +22,7 @@ function tx(db, mode, fn) {
   });
 }
 
-// fields: { title, due, tags, repeat }
+// fields: { title, due, tags, repeat, anchorDay?, priority }
 export const addTask = (db, fields) =>
   tx(db, "readwrite", (s) => s.add({ ...fields, done: false, createdAt: Date.now() }));
 export const listTasks = (db) => tx(db, "readonly", (s) => s.getAll());

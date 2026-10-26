@@ -68,5 +68,16 @@ button.tag {
 }
 .repeat { color: #8250df; }
 button.delete { background: transparent; color: #cf222e; padding: 4px 8px; }
+.priority { padding: 1px 8px; border-radius: 999px; font-weight: 600; }
+.priority.high { background: #ffebe9; color: #cf222e; }
+.priority.medium { background: #fff8c5; color: #9a6700; }
+.priority.low { background: #eaeef2; color: #57606a; }
+button.edit { background: transparent; color: #2563eb; padding: 4px 8px; }
+li.editing { display: block; }
+form.edit { margin: 0; }
+form.edit .row select, form.edit .row input { flex: 0 1 auto; }
+button.cancel { background: #eaeef2; color: #1f2328; }
+.error { margin: 0; color: #cf222e; font-size: 13px; }
+.error:empty { display: none; }
 button.stop { background: transparent; color: #57606a; padding: 4px 8px; font-size: 12px; }
 #empty { color: #8b949e; }

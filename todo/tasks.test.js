@@ -36,3 +36,31 @@ test("isOverdue only flags open tasks with a past due date", () => {
   assert.equal(isOverdue({ done: false, due: "2026-10-26" }, "2026-10-26"), false);
   assert.equal(isOverdue({ done: false }, "2026-10-26"), false);
 });
+
+test("priority filter matches the task's priority", () => {
+  const high = { done: false, tags: [], priority: "high" };
+  assert.equal(matches(high, { status: "all", tag: "", priority: "high" }), true);
+  assert.equal(matches(high, { status: "all", tag: "", priority: "low" }), false);
+});
+
+test("priority filter treats an older record without priority as medium", () => {
+  assert.equal(matches(old, { status: "all", tag: "", priority: "medium" }), true);
+  assert.equal(matches(old, { status: "all", tag: "", priority: "high" }), false);
+});
+
+test("empty priority filter matches every priority, including older records", () => {
+  const all = { status: "all", tag: "", priority: "" };
+  for (const p of ["high", "medium", "low"]) {
+    assert.equal(matches({ done: false, tags: [], priority: p }, all), true);
+  }
+  assert.equal(matches(old, all), true);
+});
+
+test("priority filter combines with status and tag filters", () => {
+  const task = { done: false, tags: ["home"], priority: "high" };
+  const filters = { status: "active", tag: "home", priority: "high" };
+  assert.equal(matches(task, filters), true);
+  assert.equal(matches(task, { ...filters, status: "done" }), false);
+  assert.equal(matches(task, { ...filters, tag: "work" }), false);
+  assert.equal(matches(task, { ...filters, priority: "low" }), false);
+});

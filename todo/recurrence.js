@@ -1,5 +1,6 @@
 // Recurring tasks: when a repeating task is completed, work out its next occurrence.
 // Pure functions over "YYYY-MM-DD" strings; no DOM or storage.
+import { priorityOf } from "./priority.js";
 
 export const REPEATS = { daily: "Daily", weekly: "Weekly", monthly: "Monthly" };
 
@@ -38,7 +39,7 @@ export function completeTask(task, today) {
   const due = task.spawned ? null : nextDue(task.due, task.repeat, today, task.anchorDay);
   const updated = { ...task, done: true };
   if (!due) return { updated, next: null };
-  const next = { title: task.title, due, tags: task.tags || [], repeat: task.repeat };
+  const next = { title: task.title, due, tags: task.tags || [], repeat: task.repeat, priority: priorityOf(task) };
   if (task.anchorDay) next.anchorDay = task.anchorDay;
   return { updated: { ...updated, spawned: true }, next };
 }
