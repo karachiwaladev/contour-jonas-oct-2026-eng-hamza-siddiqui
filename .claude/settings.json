@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git add .claude/logs/prompts.jsonl)",
       "Bash(git commit:*)",
-      "Bash(git push origin main)"
+      "Bash(git push origin main)",
+      "mcp__chrome-devtools"
     ],
     "deny": [
       "Bash(rm -rf:*)",

@@ -128,6 +128,10 @@ function check(event, ctx) {
     return { decision: "allow" };
   }
 
+  // The local browser is already limited to localhost above, so its other tools
+  // (list_console_messages, close_page, ...) never send anything out.
+  if (tool.startsWith("mcp__chrome-devtools__")) return { decision: "allow" };
+
   // Any other connector that sends, posts or deletes (Slack, email, databases): ask first.
   if (tool.startsWith("mcp__") && /(send|post|message|mail|email|chat|notify|publish|reply|delete|drop|remove|destroy|truncate|purge)/i.test(tool)) {
     return { decision: "ask", reason: `Irreversible: ${tool} sends a message or deletes data. Confirm before it runs.` };

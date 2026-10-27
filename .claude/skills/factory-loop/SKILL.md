@@ -115,6 +115,7 @@ The loop itself is a dispatcher. It fetches, skips, reacts, routes, and does the
 | Green | `feature-builder` | branch, plan, test files | modules built, `node --test` green |
 | Check the claimed tests | the loop itself runs `.claude/evals/test-coverage.mjs` | test-writer's file list | PASS, or the fake files named |
 | Browser check | `browser-verifier` | project, issue, plan's Browser check | PASS/FAIL per check, screenshots |
+| Persona test | one `persona-tester` per persona in `<project>/personas.yaml`, in parallel (`persona-test` skill, loop mode) | project, the branch build | merged bugs, security holes, friction |
 | Review (run both in parallel) | `code-reviewer`, `security-reviewer` | branch, plan | findings |
 | Fix findings | `feature-builder` (fix mode) | findings | fixes with tests |
 | Score the PR's risk | the loop itself runs `.claude/evals/pr-risk.mjs` | the committed branch | level, score, signals |
@@ -198,7 +199,7 @@ Deeper guidance, read when the step needs it:
 
 Questions and approval happen **on the GitHub issue**, not in the session: don't use `AskUserQuestion`. Each step that needs a human posts a comment, leaves the issue open, and ends work on that ticket for this run. Step 2 picks the ticket back up once a human replies.
 
-Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**, then **`feature-builder`**. Step 5 is **`browser-verifier`**. Step 6 is **`code-reviewer`** and **`security-reviewer`** in parallel, then **`feature-builder`** in fix mode. Steps 7 and 8 stay with the loop itself.
+Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**, then **`feature-builder`**. Step 5 is **`browser-verifier`**, then the **`persona-test`** skill. Step 6 is **`code-reviewer`** and **`security-reviewer`** in parallel, then **`feature-builder`** in fix mode. Steps 7 and 8 stay with the loop itself.
 
 1. **Clarify.** Read the root `CLAUDE.md`, plus the project's own `CLAUDE.md` and code if it exists.
    - List the assumptions the ticket leaves open: data model, UI placement, edge cases, scope, and anything ambiguous.
@@ -229,6 +230,9 @@ Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**,
    - Exercise every requirement in the ticket and check the console for errors.
    - Save screenshots to `<project>/screenshots/issue-<n>-<step>.png`.
    - If something fails, fix it, add a unit test for it if it's logic, and check again before going on.
+   - **Persona test:** if the project has a `personas.yaml`, run the `persona-test` skill in loop mode on the branch build (its "In the factory loop" section). Its findings are handled like this:
+     - confirmed bugs, and any security hole the adversarial persona finds, go to `feature-builder` with a regression test, and the affected checks are rerun;
+     - friction goes in the PR under **Persona test**, for the human to decide on.
 6. **Review.** Run the code review and the security review (`references/review.md`):
    - Fix the real findings, then rerun `node --test`. If the UI changed, also redo the affected Chrome check.
    - High or critical security findings block the PR.
@@ -255,6 +259,8 @@ Steps 1 to 3 are the **`ticket-planner`** subagent. Step 4 is **`test-writer`**,
    ...code review findings and fixes; security checklist results...
    ## Risk
    ...pr-risk level, score and signals...
+   ## Persona test
+   ...personas run, bugs fixed, security defences held, friction...
    ## How each requirement was verified
    ...screenshots...
    ```
