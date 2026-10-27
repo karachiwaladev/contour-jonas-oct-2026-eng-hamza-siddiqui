@@ -17,9 +17,10 @@ export function renderPriorityOptions(addSelect, filterSelect) {
   );
 }
 
-// Updates `filters` from the status buttons and the tag and priority selects,
-// then calls onChange().
-export function bindFilters({ statusButtons, tagSelect, prioritySelect }, filters, onChange) {
+// Updates `filters` from the search box, the status buttons and the tag and
+// priority selects, then calls onChange().
+export function bindFilters({ searchInput, statusButtons, tagSelect, prioritySelect }, filters, onChange) {
+  bindSearch(searchInput, filters, onChange);
   statusButtons.forEach((btn) =>
     btn.addEventListener("click", () => {
       filters.status = btn.dataset.status;
@@ -33,6 +34,21 @@ export function bindFilters({ statusButtons, tagSelect, prioritySelect }, filter
   });
   prioritySelect.addEventListener("change", () => {
     filters.priority = prioritySelect.value;
+    onChange();
+  });
+}
+
+// Filters on every keystroke (and the field's built-in clear button); Escape clears it.
+function bindSearch(searchInput, filters, onChange) {
+  searchInput.addEventListener("input", () => {
+    filters.search = searchInput.value;
+    onChange();
+  });
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    e.preventDefault();
+    searchInput.value = "";
+    filters.search = "";
     onChange();
   });
 }

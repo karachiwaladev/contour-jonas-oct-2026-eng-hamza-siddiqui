@@ -11,7 +11,7 @@ form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .row #tags { flex: 1; min-width: 140px; }
 label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #57606a; }
-input[type="text"], input[type="date"], select {
+input[type="text"], input[type="search"], input[type="date"], select {
   padding: 10px 12px;
   font-size: 16px;
   border: 1px solid #d0d7de;
@@ -29,6 +29,8 @@ input[type="date"], select { padding: 8px 10px; font-size: 14px; }
   gap: 8px;
   margin-bottom: 12px;
 }
+#filters .search { flex: 1 1 100%; }
+#search { flex: 1; min-width: 0; padding: 8px 10px; font-size: 14px; }
 .status { display: flex; border: 1px solid #d0d7de; border-radius: 6px; overflow: hidden; }
 .status button { background: #fff; color: #1f2328; border-radius: 0; padding: 8px 12px; }
 .status button + button { border-left: 1px solid #d0d7de; }

@@ -8,7 +8,7 @@ import { renderTasks, renderTagOptions } from "./render.js";
 import { renderPriorityOptions, bindFilters } from "./controls.js";
 
 const $ = (id) => document.getElementById(id);
-const filters = { status: "all", tag: "", priority: "" };
+const filters = { status: "all", tag: "", priority: "", search: "" };
 let editingId = null; // id of the task shown as an edit form, if any
 renderPriorityOptions($("priority"), $("priority-filter"));
 
@@ -92,7 +92,12 @@ $("new-task").addEventListener("submit", async (e) => {
 });
 
 bindFilters(
-  { statusButtons: document.querySelectorAll("[data-status]"), tagSelect: $("tag-filter"), prioritySelect: $("priority-filter") },
+  {
+    searchInput: $("search"),
+    statusButtons: document.querySelectorAll("[data-status]"),
+    tagSelect: $("tag-filter"),
+    prioritySelect: $("priority-filter"),
+  },
   filters,
   refresh
 );
