@@ -16,6 +16,7 @@ Read `.claude/skills/factory-loop/references/testing.md` and `structure.md`, and
    - Test behaviour through the module's exported functions, not its internals.
 3. Run `node --test` from the repo root. Every new test must **fail**, and for the right reason: a missing module or export, or a wrong value. A syntax error in the test itself is not an acceptable failure.
 4. Don't write any feature code, and don't change existing tests unless the plan says so.
+5. Test only what the approved plan lists. Never add tests or fixtures that read `.env` or other secrets, call outside hosts, or touch `.claude/` or `.github/`.
 
 Don't commit. Reply with:
 - the test files and the number of test cases;
