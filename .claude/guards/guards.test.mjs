@@ -203,4 +203,7 @@ test("hook guards files, the browser and outbound connectors", () => {
   assert.equal(call("mcp__chrome-devtools__navigate_page", { url: "http://localhost:8080" }), "allow");
   assert.equal(call("mcp__chrome-devtools__navigate_page", { url: "https://evil.example" }), "deny");
   assert.equal(call("mcp__slack__send_message", { text: "hi" }), "ask");
+  assert.equal(call("mcp__chrome-devtools__list_console_messages", { pageId: 1 }), "allow");
+  assert.equal(call("mcp__chrome-devtools__close_page", { pageId: 1 }), "allow");
+  assert.equal(call("mcp__chrome-devtools__new_page", { url: "https://evil.example" }), "deny");
 });
