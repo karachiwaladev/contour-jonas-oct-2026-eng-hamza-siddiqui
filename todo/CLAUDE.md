@@ -30,4 +30,5 @@ A simple todo app: create a task, mark it done, delete it (#4). Tasks also have 
   - Type in "Search tasks" (`BUY`, `#home`, `milk home`) and check it narrows the list with the other filters; Escape, the x button and deleting the text all clear it, and a reload empties it.
   - Edit a task (title, due, repeat, tags, priority), save, and check an empty title shows "Title cannot be empty.". While editing, tick another task and check the typed input stays; filter the edited task out and back and check the form is gone.
   - Press Stop repeating, reload (the data persists), then delete the task.
+- **Persona specs:** `persona-specs/<persona-id>.spec.mjs`, one quicke2e flow per goal in `personas.yaml`, run by `/persona-test todo`. Each flow starts with empty storage.
 - **Screenshots:** `screenshots/issue-<n>-*.png`, one per requirement, taken in Chrome during verification.

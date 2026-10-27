@@ -40,7 +40,7 @@ Each project gets its own folder. Use `projects/<name>/` by default, or the exac
   - `test-writer` writes the failing tests;
   - `feature-builder` builds until the tests pass;
   - `browser-verifier` does the Chrome check;
-  - `persona-tester` plays one user persona in its own Chrome tab, several in parallel, including an adversarial one;
+  - `/persona-test` runs each persona's goals as quicke2e flows driven by the Jev model, all in parallel (`<project>/persona-specs/`, key `JEV_API_KEY` in `.env`); with `--deep`, `persona-tester` plays one persona per Chrome tab, including an adversarial one;
   - `code-reviewer` and `security-reviewer` review the branch.
 - Run it on a schedule with `/loop 1m /factory-loop`.
 

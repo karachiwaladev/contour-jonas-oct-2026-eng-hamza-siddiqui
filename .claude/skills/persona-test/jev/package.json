@@ -1,0 +1,9 @@
+{
+  "name": "persona-test-jev",
+  "private": true,
+  "description": "Fast persona testing: quicke2e drives the browser with the Jev decision model. Install with npm ci.",
+  "type": "module",
+  "dependencies": {
+    "quicke2e": "0.5.0"
+  }
+}

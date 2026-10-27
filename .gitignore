@@ -1,3 +1,11 @@
 .claude/logs/.prompts-state.json
 .claude/scheduled_tasks.lock
 .claude/tmp/
+
+# Local secrets: never commit
+.env
+.env.*
+!.env.example
+
+# Persona test runner deps (.claude/skills/persona-test/jev): npm ci restores them
+node_modules/
