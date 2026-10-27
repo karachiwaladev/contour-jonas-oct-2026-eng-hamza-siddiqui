@@ -26,6 +26,13 @@ jobs:
         run: node --test .claude/evals/test-coverage.test.mjs
       - name: PR risk eval self-tests
         run: node --test .claude/evals/pr-risk.test.mjs
+      - name: Poisoned-ticket guard self-tests
+        run: node --test .claude/guards/guards.test.mjs
+      # Factory branches come from tickets, which may be poisoned: block guardrail
+      # changes, planted instructions, outbound calls, install scripts and secrets.
+      - name: PR guard (factory branches)
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'factory/')
+        run: node .claude/guards/pr-guard.mjs --base "origin/${{ github.base_ref }}" --head HEAD
       - name: Coverage eval (new tests must add coverage)
         if: github.event_name == 'pull_request'
         run: node .claude/evals/test-coverage.mjs --base "origin/${{ github.base_ref }}"
