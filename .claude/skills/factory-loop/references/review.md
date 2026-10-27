@@ -1,26 +1,20 @@
 # Review: code review and security review before the PR
 
-Run both after the tests pass and the Chrome check is done, on the ticket branch.
+The loop runs both after the tests pass and the Chrome check is done, on the ticket branch, by dispatching the `code-reviewer` and `security-reviewer` subagents in parallel. Neither one edits; the loop sends real findings to `feature-builder` in fix mode.
 
 ## 1. Code review
 
-Run the `code-review` skill on the branch's changes against `main`:
-
-```
-Skill: code-review   args: main...HEAD
-```
-
-On top of its findings, check:
+Review the branch's changes against `main` for correctness bugs, and check:
 - **Structure** (`structure.md`): no god files, each module has one job, `main.js` stays thin, no new globals.
 - **Tests** (`testing.md`): every requirement and edge case in the approved plan has a test, and tests check behaviour, not implementation details.
 - **Compatibility:** older stored data still loads.
 - **Scope:** nothing unrelated to the ticket changed.
 
-Fix every real finding, then rerun `node --test`. If the UI changed, also redo the affected Chrome check.
+After the fixes, the loop reruns `node --test`. If the UI changed, it also redoes the affected Chrome check.
 
 ## 2. Security review
 
-Run the `security-review` skill on the same changes, then go through this checklist for these browser apps:
+Check the same changes against this checklist for these browser apps:
 
 - **XSS:** user text goes into the page with `textContent`, `new Option(...)` or `setAttribute`. Never use `innerHTML`, `outerHTML`, `insertAdjacentHTML` or `document.write` with data.
 - **No code from strings:** no `eval`, `new Function`, or `setTimeout` given a string.
@@ -60,7 +54,7 @@ The score is deterministic and comes only from the diff and the code:
 | Test files deleted | 10 each |
 | Changed modules that no test imports | 3 each (max 15) |
 
-**Levels:** Low is under 25, Medium is 25–49, High is 50 or more. As a reference, PR #6 (favicon and screenshots) scores 0, Low. PR #8 (recurring tasks plus splitting `app.js` into modules) scores 72, High.
+**Levels:** Low is under 25, Medium is 25–49, High is 50 or more.
 
 The eval reports and doesn't block. Use the level to:
 - add a `risk:<level>` label to the PR;

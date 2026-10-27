@@ -74,3 +74,4 @@ Update this table whenever a project is added, renamed or retired.
   - `pr-guard.mjs` blocks payloads before a PR is opened.
   - See `.claude/skills/factory-loop/references/untrusted-input.md`.
 - **Irreversible actions need a human's "confirm"** on the issue: deleting data, tables or files, and sending messages outside the repo. The hook also asks in the session.
+- **Changing the factory itself:** agents can't edit `.claude/` or `.github/`. Stage and test the change outside the repo, then give the human one command to run in a terminal (not `!` in the VS Code chat). Register hooks and settings last.
