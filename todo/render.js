@@ -2,6 +2,8 @@
 // user actions are reported through the `on` callbacks.
 import { isOverdue } from "./tasks.js";
 import { REPEATS } from "./recurrence.js";
+import { PRIORITIES, priorityOf } from "./priority.js";
+import { editForm } from "./edit-form.js";
 
 // Rebuild the tag dropdown. The caller makes sure `selected` is "" or a tag in `tags`.
 export function renderTagOptions(select, tags, selected) {
@@ -10,11 +12,30 @@ export function renderTagOptions(select, tags, selected) {
   select.value = selected;
 }
 
-// on: { toggle(task, checked), remove(task), filterTag(tag), stopRepeating(task) }
-export function renderTasks(list, empty, { visible, total, today, on }) {
-  list.replaceChildren(...visible.map((task) => taskItem(task, today, on)));
+// on: { toggle(task, checked), remove(task), filterTag(tag), stopRepeating(task),
+//       edit(task), save(task, input), cancel() }
+// `visible` is already filtered and sorted; the task whose id is `editingId` renders as a form.
+// An open form for the same task is reused, so unsaved input and focus survive a re-render;
+// the title is focused only when the form is first opened.
+export function renderTasks(list, empty, { visible, total, today, editingId, on }) {
+  const open = list.querySelector("li.editing");
+  const reuse = open && open.dataset.taskId === String(editingId) ? open : null;
+  const focused = reuse?.contains(document.activeElement) ? document.activeElement : null;
+  list.replaceChildren(
+    ...visible.map((task) => (task.id === editingId ? reuse || editItem(task, on) : taskItem(task, today, on)))
+  );
+  if (focused) focused.focus();
+  else if (!reuse) list.querySelector("form.edit input")?.focus();
   empty.hidden = visible.length > 0;
   empty.textContent = total ? "No tasks match these filters." : "No tasks yet.";
+}
+
+function editItem(task, on) {
+  const li = document.createElement("li");
+  li.className = "editing";
+  li.dataset.taskId = String(task.id);
+  li.append(editForm(task, on));
+  return li;
 }
 
 function taskItem(task, today, on) {
@@ -40,14 +61,21 @@ function taskItem(task, today, on) {
   if (REPEATS[task.repeat] && !task.done) {
     li.append(button("Stop repeating", "stop", () => on.stopRepeating(task)));
   }
+  li.append(button("Edit", "edit", () => on.edit(task)));
   li.append(button("Delete", "delete", () => on.remove(task)));
   return li;
 }
 
-// Due date, repeat badge and tag chips.
+// Priority badge, due date, repeat badge and tag chips.
 function taskMeta(task, today, on) {
   const meta = document.createElement("div");
   meta.className = "meta";
+  // The class comes from priorityOf's fixed key list, never the raw stored value.
+  const level = priorityOf(task);
+  const flag = document.createElement("span");
+  flag.className = "priority " + level;
+  flag.textContent = PRIORITIES[level];
+  meta.append(flag);
   if (task.due) {
     const due = document.createElement("span");
     due.className = "due" + (isOverdue(task, today) ? " overdue" : "");

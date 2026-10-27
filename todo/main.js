@@ -2,10 +2,15 @@
 import { openDb, addTask, listTasks, changeTask, deleteTask } from "./db.js";
 import { parseTags, matches, tagsInUse } from "./tasks.js";
 import { completeTask, reopenTask, stopRepeating, newRecurringFields, toISODate } from "./recurrence.js";
+import { normalizePriority, sortTasks } from "./priority.js";
+import { validateEdit, applyEdit, keepEditing } from "./edit.js";
 import { renderTasks, renderTagOptions } from "./render.js";
+import { renderPriorityOptions, bindFilters } from "./controls.js";
 
 const $ = (id) => document.getElementById(id);
-const filters = { status: "all", tag: "" };
+const filters = { status: "all", tag: "", priority: "" };
+let editingId = null; // id of the task shown as an edit form, if any
+renderPriorityOptions($("priority"), $("priority-filter"));
 
 let db;
 try {
@@ -21,10 +26,13 @@ async function refresh() {
   const tags = tagsInUse(tasks);
   if (!tags.includes(filters.tag)) filters.tag = "";
   renderTagOptions($("tag-filter"), tags, filters.tag);
+  const visible = sortTasks(tasks.filter((t) => matches(t, filters)));
+  editingId = keepEditing(visible, editingId);
   renderTasks($("tasks"), $("empty"), {
-    visible: tasks.filter((t) => matches(t, filters)),
+    visible,
     total: tasks.length,
     today: toISODate(),
+    editingId,
     on: handlers,
   });
 }
@@ -39,6 +47,7 @@ const handlers = {
   },
   async remove(task) {
     await deleteTask(db, task.id);
+    if (editingId === task.id) editingId = null;
     refresh();
   },
   filterTag(tag) {
@@ -49,6 +58,24 @@ const handlers = {
     await changeTask(db, task.id, (current) => ({ updated: stopRepeating(current), next: null }));
     refresh();
   },
+  edit(task) {
+    editingId = task.id;
+    refresh();
+  },
+  cancel() {
+    editingId = null;
+    refresh();
+  },
+  // Returns the validation error for the form to show, or "" once saved.
+  async save(task, input) {
+    const error = validateEdit(input);
+    if (error) return error;
+    const today = toISODate();
+    await changeTask(db, task.id, (current) => ({ updated: applyEdit(current, input, today), next: null }));
+    editingId = null;
+    refresh();
+    return "";
+  },
 };
 
 $("new-task").addEventListener("submit", async (e) => {
@@ -57,23 +84,17 @@ $("new-task").addEventListener("submit", async (e) => {
   if (!title) return;
   const due = $("due").value;
   const recurring = newRecurringFields(due, $("repeat").value, toISODate());
-  await addTask(db, { title, due, tags: parseTags($("tags").value), ...recurring });
+  const priority = normalizePriority($("priority").value);
+  await addTask(db, { title, due, tags: parseTags($("tags").value), priority, ...recurring });
   e.target.reset();
   $("title").focus();
   refresh();
 });
 
-const statusButtons = document.querySelectorAll("[data-status]");
-statusButtons.forEach((btn) =>
-  btn.addEventListener("click", () => {
-    filters.status = btn.dataset.status;
-    statusButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-    refresh();
-  })
+bindFilters(
+  { statusButtons: document.querySelectorAll("[data-status]"), tagSelect: $("tag-filter"), prioritySelect: $("priority-filter") },
+  filters,
+  refresh
 );
-$("tag-filter").addEventListener("change", (e) => {
-  filters.tag = e.target.value;
-  refresh();
-});
 
 refresh();

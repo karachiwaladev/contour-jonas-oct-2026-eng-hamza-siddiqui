@@ -38,7 +38,7 @@ const weekly = { id: 1, title: "Water plants", due: "2026-10-27", tags: ["home"]
 test("completing a recurring task marks it done and creates the next occurrence", () => {
   const { updated, next } = completeTask(weekly, TODAY);
   assert.deepEqual(updated, { ...weekly, done: true, spawned: true });
-  assert.deepEqual(next, { title: "Water plants", due: "2026-11-03", tags: ["home"], repeat: "weekly" });
+  assert.deepEqual(next, { title: "Water plants", due: "2026-11-03", tags: ["home"], repeat: "weekly", priority: "medium" });
 });
 
 test("completing an already spawned task creates nothing new", () => {
@@ -86,4 +86,21 @@ test("after Stop repeating, completing creates nothing", () => {
   const stopped = stopRepeating(weekly);
   assert.equal(stopped.repeat, "");
   assert.equal(completeTask(stopped, TODAY).next, null);
+});
+
+test("the next occurrence keeps the task's priority", () => {
+  const gym = { title: "Gym", due: "2026-10-27", repeat: "weekly", tags: ["health"], priority: "high" };
+  assert.deepEqual(completeTask(gym, TODAY).next, { title: "Gym", due: "2026-11-03", tags: ["health"], repeat: "weekly", priority: "high" });
+});
+
+test("an older recurring task without priority spawns a medium copy", () => {
+  assert.equal(completeTask(weekly, TODAY).next.priority, "medium");
+});
+
+test("a monthly next occurrence keeps its anchorDay and priority", () => {
+  const rent = { title: "Pay rent", due: "2027-01-31", tags: [], repeat: "monthly", anchorDay: 31, done: false, priority: "low" };
+  const next = completeTask(rent, TODAY).next;
+  assert.equal(next.due, "2027-02-28");
+  assert.equal(next.anchorDay, 31);
+  assert.equal(next.priority, "low");
 });
